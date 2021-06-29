@@ -9,11 +9,11 @@ function Thumbnail({ result }) {
   return (
     <div className="p-2 group cursor-pointer transition duration-200 ease-in transform sm:hover:scale-105 hover:z-50">
       <Image
-        layout='responsive'
+        layout="responsive"
         src={`${BASE_URL}${result.backdrop_path || result.poster_path}`
         }
-        width={1000}
-        height={1920}
+        width={800}
+        height={500}
       />
 
       <div className="p-2">
