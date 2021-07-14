@@ -81,7 +81,7 @@ export default function Home({ results }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Header handleSearch={handleSearch} />
+      <Header handleSearch={handleSearch} handleSort={handleSort} />
       <Nav />
       <Results results={movies} addToFavourites={addToFavourites} />
     </div>
