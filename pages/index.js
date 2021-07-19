@@ -1,12 +1,29 @@
 import Head from "next/head";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+//import { useDispatch } from "react-redux";
 import Header from "../components/Header";
 import Nav from "../components/Nav";
 import Results from "../components/Results";
 import requests from "../util/requests";
+//import * as movieActions from "../redux/actions/movie";
 
 export default function Home({ results }) {
   const [movies, setMovies] = useState(results);
+
+//   useEffect(() => {
+//     fetch(
+//       `https://api.themoviedb.org/3${
+//         requests[genre]?.url || requests.fetchTrending.url
+//       }`
+//     ).then((res) => res.json());
+// }, []);
+
+  // const dispatch = useDispatch();
+  // useEffect(() => {
+  //   dispatch(movieActions.setMovies(results));
+    
+  //     console.log("useEffect has been called!", movies);
+  // }, []);
 
   const handleSearch = (event) => {
     const { value } = event.target;
@@ -95,13 +112,11 @@ export default function Home({ results }) {
 
 export async function getServerSideProps(context) {
   const genre = context.query.genre;
-
   const request = await fetch(
     `https://api.themoviedb.org/3${
       requests[genre]?.url || requests.fetchTrending.url
     }`
   ).then((res) => res.json());
-
   return {
     props: {
       results: request.results,
