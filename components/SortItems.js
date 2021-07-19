@@ -14,7 +14,7 @@ function SortItems({ sortBy }) {
   };
 
   return (
-    <div className="relative mb-6">
+    <div className="relative mb-6 ml-8 mt-6">
       <button
         onClick={handleOpen}
         className="inline-flex items-center h-10 px-5 text-indigo-100 transition-colors duration-150 bg-indigo-700 rounded-lg focus:shadow-outline hover:bg-indigo-800"

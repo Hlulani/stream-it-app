@@ -6,8 +6,8 @@ import Results from "../components/Results";
 import requests from "../util/requests";
 
 export default function Home({ results }) {
-  console.log("results", results);
   const [movies, setMovies] = useState(results);
+
   const handleSearch = (event) => {
     const { value } = event.target;
 
@@ -26,7 +26,7 @@ export default function Home({ results }) {
       setMovies(results);
     } else {
       const filteredMoviesByYear = results.filter(
-        (result) => new Date(result.release_date)?.getFullYear() === value
+        (result) => new Date(result.release_date)?.getFullYear() === +filter
       );
       setMovies(filteredMoviesByYear);
     }
@@ -37,7 +37,7 @@ export default function Home({ results }) {
       setMovies(results);
     } else {
       const filteredMoviesByGenre = results.filter((result) =>
-        result.genre_ids?.includes(value)
+        result.genre_ids?.includes(genre)
       );
       setMovies(filteredMoviesByGenre);
     }
@@ -81,7 +81,12 @@ export default function Home({ results }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Header handleSearch={handleSearch} handleSort={handleSort} />
+      <Header
+        handleSearch={handleSearch}
+        handleSort={handleSort}
+        handleFilterByYear={handleFilterByYear}
+        handleFilterByGenre={handleFilterByGenre}
+      />
       <Nav />
       <Results results={movies} addToFavourites={addToFavourites} />
     </div>
