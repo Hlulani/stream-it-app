@@ -10,13 +10,26 @@ import requests from "../util/requests";
 export default function Home({ results }) {
   const [movies, setMovies] = useState(results);
 
-//   useEffect(() => {
-//     fetch(
-//       `https://api.themoviedb.org/3${
-//         requests[genre]?.url || requests.fetchTrending.url
-//       }`
-//     ).then((res) => res.json());
-// }, []);
+  useEffect(() => {
+    const request = fetch(
+      `https://api.themoviedb.org/3${
+        requests.fetchTrending.url|| requests[genre]?.url 
+      }`, {
+        mode: 'no-cors'
+      }
+    ); 
+    debugger;
+    request.then(r => {
+      const d = r.json();
+      d.then(p =>{
+        debugger;
+        console.log(p);
+      }).catch(e => {
+        debugger;
+        console.log(e)
+      })
+    })    
+}, []);
 
   // const dispatch = useDispatch();
   // useEffect(() => {
