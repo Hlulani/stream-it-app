@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Nav from "../components/Nav";
 import Results from "../components/Results";
+import SearchDropdown from "../components/SearchDropdown";
 import requests from "../util/requests";
 //import * as movieActions from "../redux/actions/movie";
 
@@ -11,30 +12,19 @@ export default function Home({ results }) {
   const [movies, setMovies] = useState(results);
 
   useEffect(() => {
-    const request = fetch(
-      `https://api.themoviedb.org/3${
-        requests.fetchTrending.url|| requests[genre]?.url 
-      }`, {
-        mode: 'no-cors'
-      }
-    ); 
-    debugger;
-    request.then(r => {
-      const d = r.json();
-      d.then(p =>{
-        debugger;
-        console.log(p);
-      }).catch(e => {
-        debugger;
-        console.log(e)
-      })
-    })    
-}, []);
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get("genre") === "fetchFavourites") {
+      const parsed = JSON.parse(localStorage.getItem("favourites") || "[]");
+      setMovies(parsed);
+    } else {
+      setMovies(results);
+    }
+  }, [results]);
 
   // const dispatch = useDispatch();
   // useEffect(() => {
   //   dispatch(movieActions.setMovies(results));
-    
+
   //     console.log("useEffect has been called!", movies);
   // }, []);
 
@@ -52,7 +42,7 @@ export default function Home({ results }) {
   };
 
   const handleFilterByYear = (filter = "all") => {
-    if (filter === "all") {
+    if (filter === "All") {
       setMovies(results);
     } else {
       const filteredMoviesByYear = results.filter(
@@ -63,11 +53,12 @@ export default function Home({ results }) {
   };
 
   const handleFilterByGenre = (genre = "all") => {
-    if (genre === "all") {
+    debugger;
+    if (genre === "All") {
       setMovies(results);
     } else {
       const filteredMoviesByGenre = results.filter((result) =>
-        result.genre_ids?.includes(genre)
+        result.genre_ids?.includes(+genre)
       );
       setMovies(filteredMoviesByGenre);
     }
@@ -79,29 +70,53 @@ export default function Home({ results }) {
     } else {
       const sortedMovies = [...results].sort((a, b) => {
         if (sortBy === "year") {
-          return new Date(a.release_date) > new Date(b.release_date);
+          if (new Date(a.release_date) > new Date(b.release_date)) {
+            return 1;
+          } else if (new Date(a.release_date) < new Date(b.release_date)) {
+            return -1;
+          }
+          return 0;
+        } else if (sortBy === "title") {
+          if (a.original_title > b.original_title) {
+            return 1;
+          } else if (a.original_title < b.original_title) {
+            return -1;
+          }
+          return 0;
         }
-        return a.title?.localeCompare(b.title);
       });
+      debugger;
       setMovies(sortedMovies);
     }
   };
 
   const addToFavourites = (movie) => {
-    const favourites = localStorage.getItem("favourites");
+    const addTofavouritePromise = new Promise((resolve, reject) => {
+      const favourites = localStorage.getItem("favourites");
 
-    if (favourites == null) {
-      localStorage.setItem("favourites", JSON.stringify([movie]));
-    } else {
-      const parsedFavourites = JSON.parse(favourites);
-      const isExisting = parsedFavourites.find(
-        (fav) => fav.title === movie.title
-      );
-      if (!isExisting) {
-        parsedFavourites?.push(movie);
-        localStorage.setItem("favourites", JSON.stringify(parsedFavourites));
+      if (favourites == null) {
+        localStorage.setItem("favourites", JSON.stringify([movie]));
+        resolve("success");
+        return;
+      } else {
+        const parsedFavourites = JSON.parse(favourites);
+        const isExisting = parsedFavourites.find(
+          (fav) => fav.title === movie.title
+        );
+        if (!isExisting) {
+          parsedFavourites?.push(movie);
+          localStorage.setItem("favourites", JSON.stringify(parsedFavourites));
+          resolve("success");
+          return;
+        } else {
+          resolve("success");
+          return;
+        }
+        reject("failed");
       }
-    }
+    });
+
+    return addTofavouritePromise;
   };
 
   return (
@@ -113,10 +128,16 @@ export default function Home({ results }) {
 
       <Header
         handleSearch={handleSearch}
+        handleFilterByYear={handleFilterByYear}
+        handleFilterByGenre={handleFilterByGenre}
+      />
+
+      <SearchDropdown
         handleSort={handleSort}
         handleFilterByYear={handleFilterByYear}
         handleFilterByGenre={handleFilterByGenre}
       />
+
       <Nav />
       <Results results={movies} addToFavourites={addToFavourites} />
     </div>
@@ -125,6 +146,7 @@ export default function Home({ results }) {
 
 export async function getServerSideProps(context) {
   const genre = context.query.genre;
+  console.log("GET SSP", genre);
   const request = await fetch(
     `https://api.themoviedb.org/3${
       requests[genre]?.url || requests.fetchTrending.url

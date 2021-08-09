@@ -18,9 +18,6 @@ export default function Header({
       <div className="flex flex-grow justify-evenly max-w-2xl">
         <HeaderItems title="HOME" Icon={HomeIcon} />
         <Searchbox placeholder="SEARCH" onChange={handleSearch} />
-        <SortItems sortBy={handleSort} />
-        <FilterByYear handleFilterByYear={handleFilterByYear} />
-        <FilterByGenre handleFilterByGenre={handleFilterByGenre} />
       </div>
 
       <Image
